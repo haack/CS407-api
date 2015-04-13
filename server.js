@@ -4,7 +4,10 @@ var express = require('express'),
 console.log("Starting server...");
 var app = express();
 
-app.get('/test', routes.test);
+app.get('/song/:filename', routes.song);
+
+app.get('/test', routes.testGet);
+app.post('/test', routes.testPost);
 
 app.listen(1337);
 console.log('Listening on port 1337...');
