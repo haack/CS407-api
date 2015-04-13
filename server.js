@@ -5,6 +5,7 @@ console.log("Starting server...");
 var app = express();
 
 app.get('/song/:filename', routes.song);
+app.post('/song/', routes.addSong);
 
 app.get('/test', routes.testGet);
 app.post('/test', routes.testPost);
