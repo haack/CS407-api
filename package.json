@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.12.2",
-    "express": "^4.12.3"
+    "express": "^4.12.3",
+    "mongojs": "^0.18.2",
+    "pg": "^4.3.0"
   }
 }

@@ -16,19 +16,21 @@ exports.song = function(req, res, next) {
 	}
 };
 
-exports.addSong = function(req, res, next) {
+exports.addSong = function(req, res) {
 	console.log("/POST on " + req.originalUrl);
 	
-	console.log("Adding song...");
+	console.log("Adding song: " + req.body.name);
+	console.log("Features: " + JSON.stringify(req.body.features));
+	
 	res.send({'result': 'success'});
 };
 
-exports.testGet = function(req, res, next) {
+exports.testGet = function(req, res) {
 	console.log("/GET on /test");
 	res.send({'Yay':'This GET has gone swimmingly'});
 };
 
-exports.testPost = function(req, res, next) {
+exports.testPost = function(req, res) {
 	console.log("/POST on /test");
 	res.send({'Yay':'This POST has gone swimmingly'});
 };
