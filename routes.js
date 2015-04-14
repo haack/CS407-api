@@ -1,19 +1,23 @@
-exports.song = function(req, res, next) {
+mongojs = require("mongojs");
+
+db = mongojs.connect("fluctus", ["featuredata"]);
+
+exports.song = function(req, res) {
 	console.log("/GET on " + req.originalUrl);
 
     var file = req.params.filename;
 	console.log("Requesting: " + file);
 
-	if (file == "joe") { //been there done that
-		res.send({
-			'seen': true, 
-			'featurex': 3,
-			'featurey': 1,
-			'featurez': 4
-		});
-	} else { //song not seen before
-		res.send({'seen': false});
-	}
+	db.featuredata.findOne({"name": file}, function(err, docs) {
+	    // docs is an array of all the documents in mycollection 
+	    console.log(docs);
+	    if (docs) {
+	    	docs.seen = true;
+	    	res.send(docs);
+	    } else {
+	    	res.send({"seen": false});
+	    }
+	});
 };
 
 exports.addSong = function(req, res) {
@@ -21,8 +25,25 @@ exports.addSong = function(req, res) {
 	
 	console.log("Adding song: " + req.body.name);
 	console.log("Features: " + JSON.stringify(req.body.features));
-	
-	res.send({'result': 'success'});
+
+	db.featuredata.insert(req.body, function(err, result) {
+		if (!err) {
+			res.send({'result': 'success'});
+		} else {
+			res.send({'result': 'error'});
+		}
+	});
+};
+
+exports.recommend = function(req, res) {
+	console.log("/POST on " + req.originalUrl);
+
+	console.log("Generating recommendations...");
+
+	res.send({"recs": [
+			{"name": "Dark_side_of_the_moon"},
+			{"name": "Kitchen_sink"}
+		]});
 };
 
 exports.testGet = function(req, res) {
