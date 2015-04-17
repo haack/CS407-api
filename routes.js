@@ -145,7 +145,7 @@ exports.testPost = function(req, res) {
 };
 
 exports.resetDB = function(req, res) {
-	db.featuredata.remove({}}, function(err, result) {
+	db.featuredata.remove({}, function(err, result) {
 		res.send({"Result": "All gone"});
-	}
-}
+	});
+};
