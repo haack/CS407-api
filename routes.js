@@ -143,3 +143,9 @@ exports.testPost = function(req, res) {
 	console.log("/POST on /test");
 	res.send({'Yay':'This POST has gone swimmingly'});
 };
+
+exports.resetDB = function(req, res) {
+	db.featuredata.remove({}}, function(err, result) {
+		res.send({"Result": "All gone"});
+	}
+}

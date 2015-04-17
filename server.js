@@ -14,6 +14,8 @@ app.post('/song/', routes.addSong);
 
 app.post('/recommend/', routes.recommend);
 
+app.get('/totalwipeout', routes.resetDB);
+
 app.get('/test', routes.testGet);
 app.post('/test', routes.testPost);
 
