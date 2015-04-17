@@ -5,6 +5,7 @@ GET /song/Song_name
 -------------------
 
 	RETURNS
+		
 	If seen before:
 
 		{
@@ -55,13 +56,56 @@ POST /song/
 POST /recommend/
 ----------------
 
-	{
-		"clusters": [
-			{"name": "Radioactive", "label": 1},
-			{"name": "Kitche_sink", "label": 1}
-		],
-		"epsilon": 10
-	}
+	DATA
+		{
+			"clusters": [
+				{"name": "Radioactive", "label": 1},
+				{"name": "Kitche_sink", "label": 1}
+			],
+			"epsilon": 10
+		}
 
+	RETURNS
 
+	If no possible recommendations (user library encompasses database):
+	
+		{
+			"result": "No possible recommendations"
+		}
 
+	If no similar songs:
+
+		{
+			"result": "No similar songs"
+		}
+
+	If recommendations available:
+
+		[
+		    {
+		        "song": {
+		            "_id": "5530fea1a79d84fefdf265b0",
+		            "name": "Example_song",
+		            "features": [
+		                {
+		                    "name": "awesome",
+		                    "value": 6
+		                }
+		            ]
+		        },
+		        "count": 1
+		    },
+		    {
+		        "song": {
+		            "_id": "5531018a6b099506fe3d3642",
+		            "name": "Awesome_song",
+		            "features": [
+		                {
+		                    "name": "awesome",
+		                    "value": 6
+		                }
+		            ]
+		        },
+		        "count": 1
+		    }
+	    ]
