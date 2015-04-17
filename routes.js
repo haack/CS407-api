@@ -29,7 +29,6 @@ exports.addSong = function(req, res) {
 	db.featuredata.insert(req.body, function(err, result) {
 		if (!err) {
 			res.send({'result': 'success'});
-			distance(req.body, null);
 		} else {
 			res.send({'result': 'error'});
 		}
