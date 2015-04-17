@@ -41,9 +41,9 @@ exports.recommend = function(req, res) {
 
 	console.log("Generating recommendations...");
 
-	clusters = req.body;
+	clusters = req.body.clusters;
 	//TODO fetch feature data for each song
-	epsilon = 5;
+	epsilon = req.body.epsilon;
 	//TODO send from client
 
 	db.featuredata.find(function(err, docs) {
@@ -52,6 +52,8 @@ exports.recommend = function(req, res) {
 		if(targetSongs.length == 0) {
 			return "No recommendations available";
 		}
+
+		// filterClusters(clusters, -1);
 
 		var recs = [];
 		
@@ -83,6 +85,15 @@ exports.recommend = function(req, res) {
 		}
 	});
 };
+
+filterClusters = function(clusters, label) {
+	for (i = 0; i < clusters.length; i++) {
+		if (clusters[i].label == label) {
+			clusters.pop(i);
+			i--;
+		}
+	}
+}
 
 getTargetSongs = function(all, user) {
 	var targetSongs = [];
