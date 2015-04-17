@@ -42,33 +42,33 @@ exports.recommend = function(req, res) {
 	console.log("Generating recommendations...");
 
 	clusters = req.body.clusters;
-	//TODO fetch feature data for each song
 	epsilon = req.body.epsilon;
-	//TODO send from client
 
 	db.featuredata.find(function(err, docs) {
 		targetSongs = getTargetSongs(docs, clusters);
 
+		filterClusters(clusters, -1);
+
+		clusterSongs = getClusterSongs(docs, clusters);
+
 		if(targetSongs.length == 0) {
-			return "No recommendations available";
+			res.send({"result": "No possible recommendations"});
 		}
 
-		// filterClusters(clusters, -1);
-
 		var recs = [];
-		
+
 		for(var i in targetSongs) {
 			var count = 0;
 
 			for(j in clusters) {
-				if(euclidean(targetSongs[i], clusters[j]) <= epsilon) {
+				if(euclidean(targetSongs[i], clusterSongs[j]) <= epsilon) {
 					count++;
 				}
 			}
 
 			if(((count > 0) && (recs.length < 10)) || ((recs.length > 10) && (count > recs[10].count))) {
-				recs.push({"song":targetSongs[i],"count":count});
-				recs.sort(function(a, b){return a.count - b.count});
+				recs.push({"song": targetSongs[i], "count": count});
+				recs.sort(function(a, b) {return a.count - b.count});
 
 				if(recs.legth > 10){
 					recs.pop();
@@ -77,7 +77,7 @@ exports.recommend = function(req, res) {
 		}
 
 		if(recs.length == 0){
-			res.send({"Result": "No recommendations available"});
+			res.send({"Result": "No similar songs"});
 		}
 		else {
 			console.log(recs.length);
@@ -89,10 +89,23 @@ exports.recommend = function(req, res) {
 filterClusters = function(clusters, label) {
 	for (i = 0; i < clusters.length; i++) {
 		if (clusters[i].label == label) {
-			clusters.pop(i);
+			clusters.splice(i, 1);
 			i--;
 		}
 	}
+}
+
+getClusterSongs = function(all, clusters) {
+	var clusterSongs = [];
+	for (i in clusters) {
+		for (j in all) {
+			if (all[j].name == clusters[i].name) {
+				clusterSongs.push(all[j]);
+				break;
+			}
+		}
+	}
+	return clusterSongs;
 }
 
 getTargetSongs = function(all, user) {
