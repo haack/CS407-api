@@ -31,7 +31,7 @@ If not seen before:
 
 POST /song/
 -----------
-DATA
+DATA:
 
 	{
 		"name": "Song_name",
@@ -47,7 +47,7 @@ DATA
 		]
 	}
 
-RETURNS
+RETURNS:
 
 	{
 		"result": "success"
@@ -55,7 +55,8 @@ RETURNS
 
 POST /recommend/
 ----------------
-DATA
+DATA:
+
 	{
 		"clusters": [
 			{"name": "Radioactive", "label": 1},
