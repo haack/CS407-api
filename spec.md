@@ -3,7 +3,6 @@ Api spec
 
 GET /song/Song_name
 -------------------
-
 RETURNS
 	
 If seen before:
@@ -32,7 +31,6 @@ If not seen before:
 
 POST /song/
 -----------
-
 DATA
 	{
 		"name": "Song_name",
@@ -55,7 +53,6 @@ RETURNS
 
 POST /recommend/
 ----------------
-
 DATA
 	{
 		"clusters": [
