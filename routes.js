@@ -67,7 +67,7 @@ exports.recommend = function(req, res) {
 				}
 
 				if(((count > 0) && (recs.length < 10)) || ((recs.length > 10) && (count > recs[10].count))) {
-					recs.push({"song": targetSongs[i], "count": count});
+					recs.push({"name": targetSongs[i].name, "count": count});
 					recs.sort(function(a, b) {return a.count - b.count});
 
 					if(recs.legth > 10){
