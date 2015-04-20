@@ -183,3 +183,9 @@ exports.resetDB = function(req, res) {
 		});
 	});
 };
+
+exports.getDB = function(req, res) {
+	db.featuredata.find(function(err, result) {
+		res.send(result);
+	});
+};

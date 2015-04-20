@@ -14,6 +14,7 @@ app.post('/song/', routes.addSong);
 
 app.post('/recommend/', routes.recommend);
 
+app.get('/bareitall', routes.getDB);
 app.get('/totalwipeout', routes.resetDB);
 
 app.get('/test', routes.testGet);
