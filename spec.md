@@ -83,29 +83,11 @@ If recommendations available:
 
 	[
 	    {
-	        "song": {
-	            "_id": "5530fea1a79d84fefdf265b0",
-	            "name": "Example_song",
-	            "features": [
-	                {
-	                    "name": "awesome",
-	                    "value": 6
-	                }
-	            ]
-	        },
+	        "name": "Example_song",
 	        "count": 1
 	    },
 	    {
-	        "song": {
-	            "_id": "5531018a6b099506fe3d3642",
-	            "name": "Awesome_song",
-	            "features": [
-	                {
-	                    "name": "awesome",
-	                    "value": 6
-	                }
-	            ]
-	        },
+	        "name": "Song_name",
 	        "count": 1
 	    }
     ]
