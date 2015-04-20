@@ -44,43 +44,45 @@ exports.recommend = function(req, res) {
 	epsilon = req.body.epsilon;
 
 	db.featuredata.find(function(err, docs) {
-		targetSongs = getTargetSongs(docs, clusters);
+		if (docs.length > 0) { 
+			targetSongs = getTargetSongs(docs, clusters);
 
-		filterClusters(clusters, -1);
+			filterClusters(clusters, -1);
 
-		clusterSongs = getClusterSongs(docs, clusters);
+			clusterSongs = getClusterSongs(docs, clusters);
 
-		if(targetSongs.length == 0) {
-			res.send({"result": "No possible recommendations"});
-		}
+			if(targetSongs.length == 0) {
+				res.send({"result": "No possible recommendations"});
+			}
 
-		var recs = [];
+			var recs = [];
 
-		for(var i in targetSongs) {
-			var count = 0;
+			for(var i in targetSongs) {
+				var count = 0;
 
-			for(j in clusters) {
-				if(euclidean(targetSongs[i], clusterSongs[j]) <= epsilon) {
-					count++;
+				for(j in clusters) {
+					if(euclidean(targetSongs[i], clusterSongs[j]) <= epsilon) {
+						count++;
+					}
+				}
+
+				if(((count > 0) && (recs.length < 10)) || ((recs.length > 10) && (count > recs[10].count))) {
+					recs.push({"song": targetSongs[i], "count": count});
+					recs.sort(function(a, b) {return a.count - b.count});
+
+					if(recs.legth > 10){
+						recs.pop();
+					}
 				}
 			}
 
-			if(((count > 0) && (recs.length < 10)) || ((recs.length > 10) && (count > recs[10].count))) {
-				recs.push({"song": targetSongs[i], "count": count});
-				recs.sort(function(a, b) {return a.count - b.count});
-
-				if(recs.legth > 10){
-					recs.pop();
-				}
+			if(recs.length == 0){
+				res.send({"Result": "No similar songs"});
 			}
-		}
-
-		if(recs.length == 0){
-			res.send({"Result": "No similar songs"});
-		}
-		else {
-			console.log(recs.length);
-			res.send(recs);
+			else {
+				console.log(recs.length);
+				res.send(recs);
+			}
 		}
 	});
 };
