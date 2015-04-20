@@ -60,6 +60,8 @@ exports.recommend = function(req, res) {
 
 	clusters = req.body.clusters;
 	epsilon = req.body.epsilon;
+	console.log(epsilon);
+	console.log(JSON.stringify(clusters));
 
 	db.featuredata.find(function(err, docs) {
 		db.minmax.find(function(err, minmax) {
