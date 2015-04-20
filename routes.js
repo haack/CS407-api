@@ -155,17 +155,6 @@ getTargetSongs = function(all, user) {
 	return targetSongs;
 }
 
-euclidean = function(s1,s2, minmax) {
-	var sum = 0;
-
-	for(var i in s1.features) {
-		var temp = Math.abs(s1.features[i].value - s2.features[i].value);
-		sum += temp*temp;
-	}
-
-	return Math.sqrt(sum);
-}
-
 normalisedEuclidean = function(s1,s2, minmax) {
 	var sum = 0;
 
