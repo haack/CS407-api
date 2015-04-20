@@ -1,8 +1,8 @@
 mongojs = require("mongojs");
 
-db = mongojs.connect("fluctus", ["featuredata"]);
+db = mongojs.connect("fluctus", ["featuredata", "minmax"]);
 
-exports.song = function(req, res) {
+exports.getSong = function(req, res) {
 	console.log("/GET on " + req.originalUrl);
 
 	var file = req.params.filename;
@@ -24,7 +24,8 @@ exports.addSong = function(req, res) {
 	console.log("/POST on " + req.originalUrl);
 	
 	console.log("Adding song: " + req.body.name);
-	console.log("Features: " + JSON.stringify(req.body.features));
+	features = req.body.features;
+	console.log("Features: " + features);
 
 	db.featuredata.insert(req.body, function(err, result) {
 		if (!err) {
@@ -33,6 +34,23 @@ exports.addSong = function(req, res) {
 			res.send({'result': 'error'});
 		}
 	});
+
+	for (i = 0; i < features.length; i++) {
+		(function(j) {
+			db.minmax.find({"name": features[j].name}, function(err, result) {
+				if (result != "") {
+					result = result[0];
+					if (features[j].value < result.min) {
+						db.minmax.update({"name": features[j].name}, {$set: {"min": features[j].value}});
+					} else if (features[j].value > result.max) {
+						db.minmax.update({"name": features[j].name}, {$set: {"max": features[j].value}});
+					}
+				} else {
+					db.minmax.insert({"name": features[j].name, "min": features[j].value, "max": features[j].value}, function(err, none) {});
+				}
+			});
+		})(i);
+	}
 };
 
 exports.recommend = function(req, res) {
@@ -148,6 +166,8 @@ exports.testPost = function(req, res) {
 
 exports.resetDB = function(req, res) {
 	db.featuredata.remove({}, function(err, result) {
-		res.send({"Result": "All gone"});
+		db.minmax.remove({}, function(err, result) {
+			res.send({"Result": "All gone"});
+		});
 	});
 };

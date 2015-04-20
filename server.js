@@ -9,7 +9,7 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/song/:filename', routes.song);
+app.get('/song/:filename', routes.getSong);
 app.post('/song/', routes.addSong);
 
 app.post('/recommend/', routes.recommend);
