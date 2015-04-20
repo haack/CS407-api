@@ -62,48 +62,59 @@ exports.recommend = function(req, res) {
 	epsilon = req.body.epsilon;
 
 	db.featuredata.find(function(err, docs) {
-		if (docs.length > 0) { 
-			targetSongs = getTargetSongs(docs, clusters);
+		db.minmax.find(function(err, minmax) {
+			if (docs.length > 0) { 
+				targetSongs = getTargetSongs(docs, clusters);
 
-			filterClusters(clusters, -1);
+				filterClusters(clusters, -1);
 
-			clusterSongs = getClusterSongs(docs, clusters);
+				clusterSongs = getClusterSongs(docs, clusters);
 
-			if(targetSongs.length == 0) {
-				res.send({"result": "No possible recommendations"});
-			}
+				if(targetSongs.length == 0) {
+					res.send({"result": "No possible recommendations"});
+				}
 
-			var recs = [];
+				var recs = [];
 
-			for(var i in targetSongs) {
-				var count = 0;
+				for(var i in targetSongs) {
+					var count = 0;
 
-				for(j in clusters) {
-					if(euclidean(targetSongs[i], clusterSongs[j]) <= epsilon) {
-						count++;
+					for(j in clusters) {
+						if(normalisedEuclidean(targetSongs[i], clusterSongs[j], minmax) <= epsilon) {
+							count++;
+						}
+					}
+
+					if(((count > 0) && (recs.length < 10)) || ((recs.length > 10) && (count > recs[10].count))) {
+						recs.push({"name": targetSongs[i].name, "count": count});
+						recs.sort(function(a, b) {return a.count - b.count});
+
+						if(recs.legth > 10){
+							recs.pop();
+						}
 					}
 				}
 
-				if(((count > 0) && (recs.length < 10)) || ((recs.length > 10) && (count > recs[10].count))) {
-					recs.push({"name": targetSongs[i].name, "count": count});
-					recs.sort(function(a, b) {return a.count - b.count});
-
-					if(recs.legth > 10){
-						recs.pop();
-					}
+				if(recs.length == 0){
+					res.send({"Result": "No similar songs"});
+				}
+				else {
+					console.log(recs.length);
+					res.send(recs);
 				}
 			}
-
-			if(recs.length == 0){
-				res.send({"Result": "No similar songs"});
-			}
-			else {
-				console.log(recs.length);
-				res.send(recs);
-			}
-		}
+		});
 	});
 };
+
+normalise = function(feature, minmax) {
+	for (i in minmax) {
+		if (minmax[i].name == feature.name) {
+			break;
+		}
+	}
+	return (feature.value - minmax[i].min) / (minmax[i].max - minmax[i].min);
+}
 
 filterClusters = function(clusters, label) {
 	for (i = 0; i < clusters.length; i++) {
@@ -144,10 +155,22 @@ getTargetSongs = function(all, user) {
 	return targetSongs;
 }
 
-euclidean = function(s1,s2) {
+euclidean = function(s1,s2, minmax) {
 	var sum = 0;
+
 	for(var i in s1.features) {
 		var temp = Math.abs(s1.features[i].value - s2.features[i].value);
+		sum += temp*temp;
+	}
+
+	return Math.sqrt(sum);
+}
+
+normalisedEuclidean = function(s1,s2, minmax) {
+	var sum = 0;
+
+	for(var i in s1.features) {
+		var temp = Math.abs(normalise(s1.features[i], minmax) - normalise(s2.features[i], minmax));
 		sum += temp*temp;
 	}
 
