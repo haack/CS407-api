@@ -77,6 +77,7 @@ exports.recommend = function(req, res) {
 				if(targetSongs.length == 0) {
 					console.log("No possible recommendations");
 					res.send({"result": "No possible recommendations"});
+					return;
 				}
 
 				var recs = [];
