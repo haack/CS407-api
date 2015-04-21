@@ -103,13 +103,14 @@ exports.recommend = function(req, res) {
 
 				if(recs.length == 0){
 					console.log("No similar songs");
-					res.send({"Result": "No similar songs"});
+					res.send({"result": "No similar songs"});
+					return;
 				}
 				else {
 					console.log(recs.length);
 					res.send(recs);
+					return;
 				}
-				console.log("Something bad happened");
 			}
 		});
 	});
