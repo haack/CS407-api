@@ -108,7 +108,7 @@ exports.recommend = function(req, res) {
 				}
 				else {
 					console.log(recs.length);
-					res.send(recs);
+					res.send({"result": "success", data: recs});
 					return;
 				}
 			}
