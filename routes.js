@@ -66,6 +66,8 @@ exports.recommend = function(req, res) {
 	db.featuredata.find(function(err, docs) {
 		db.minmax.find(function(err, minmax) {
 			if (docs.length > 0) { 
+				console.log("Something happened");
+
 				targetSongs = getTargetSongs(docs, clusters);
 
 				filterClusters(clusters, -1);
@@ -73,6 +75,7 @@ exports.recommend = function(req, res) {
 				clusterSongs = getClusterSongs(docs, clusters);
 
 				if(targetSongs.length == 0) {
+					console.log("No possible recommendations");
 					res.send({"result": "No possible recommendations"});
 				}
 
@@ -98,12 +101,14 @@ exports.recommend = function(req, res) {
 				}
 
 				if(recs.length == 0){
+					console.log("No similar songs");
 					res.send({"Result": "No similar songs"});
 				}
 				else {
 					console.log(recs.length);
 					res.send(recs);
 				}
+				console.log("Something bad happened");
 			}
 		});
 	});
