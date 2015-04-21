@@ -109,6 +109,16 @@ exports.recommend = function(req, res) {
 	});
 };
 
+exports.getMinMax = function(req, res) {
+	console.log("/POST on " + req.originalUrl);
+
+	console.log("Generating recommendations...");
+
+	db.minmax.find(function(err, docs) {
+		res.send(docs);
+	});
+};
+
 normalise = function(feature, minmax) {
 	for (i in minmax) {
 		if (minmax[i].name == feature.name) {
@@ -116,7 +126,7 @@ normalise = function(feature, minmax) {
 		}
 	}
 	return (feature.value - minmax[i].min) / (minmax[i].max - minmax[i].min);
-}
+};
 
 filterClusters = function(clusters, label) {
 	for (i = 0; i < clusters.length; i++) {
@@ -125,7 +135,7 @@ filterClusters = function(clusters, label) {
 			i--;
 		}
 	}
-}
+};
 
 getClusterSongs = function(all, clusters) {
 	var clusterSongs = [];
@@ -138,7 +148,7 @@ getClusterSongs = function(all, clusters) {
 		}
 	}
 	return clusterSongs;
-}
+};
 
 getTargetSongs = function(all, user) {
 	var targetSongs = [];
@@ -155,7 +165,7 @@ getTargetSongs = function(all, user) {
 		}
 	}
 	return targetSongs;
-}
+};
 
 normalisedEuclidean = function(s1,s2, minmax) {
 	var sum = 0;
@@ -166,7 +176,7 @@ normalisedEuclidean = function(s1,s2, minmax) {
 	}
 
 	return Math.sqrt(sum);
-}
+};
 
 exports.testGet = function(req, res) {
 	console.log("/GET on /test");

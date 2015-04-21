@@ -12,6 +12,7 @@ app.use(bodyParser.json());
 app.get('/song/:filename', routes.getSong);
 app.post('/song/', routes.addSong);
 
+app.get('/minmax/', routes.getMinMax);
 app.post('/recommend/', routes.recommend);
 
 app.get('/bareitall', routes.getDB);
