@@ -1,15 +1,16 @@
 mongojs = require("mongojs");
 
+//connect to db with access to specified collections
 db = mongojs.connect("fluctus", ["featuredata", "minmax"]);
 
 exports.getSong = function(req, res) {
 	console.log("/GET on " + req.originalUrl);
 
+	//get requested filename
 	var file = req.params.filename;
 	console.log("Requesting: " + file);
 
 	db.featuredata.findOne({"name": file}, function(err, docs) {
-		// docs is an array of all the documents in mycollection 
 		console.log(docs);
 		if (docs) {
 			docs.seen = true;
@@ -24,8 +25,9 @@ exports.addSong = function(req, res) {
 	console.log("/POST on " + req.originalUrl);
 	
 	console.log("Adding song: " + req.body.name);
+	
+	//get features sent
 	features = req.body.features;
-	console.log("Features: " + features);
 
 	db.featuredata.insert(req.body, function(err, result) {
 		if (!err) {
@@ -35,6 +37,8 @@ exports.addSong = function(req, res) {
 		}
 	});
 
+
+	//update tracked min and max values
 	for (i = 0; i < features.length; i++) {
 		(function(j) {
 			db.minmax.find({"name": features[j].name}, function(err, result) {
@@ -60,53 +64,65 @@ exports.recommend = function(req, res) {
 
 	clusters = req.body.clusters;
 	epsilon = req.body.epsilon;
-	console.log(epsilon);
-	console.log(JSON.stringify(clusters));
+	console.log("Requested epsilon: " + epsilon);
+	console.log("Clusters recieved: " + JSON.stringify(clusters));
 
+	//get all feature data
 	db.featuredata.find(function(err, docs) {
+		//get all minmax for normalisation
 		db.minmax.find(function(err, minmax) {
 			if (docs.length > 0) { 
-				console.log("Something happened");
-
+				//get all songs that can be recommended (anything not sent by user)
 				targetSongs = getTargetSongs(docs, clusters);
 
+				//filter out unclustered songs
 				filterClusters(clusters, -1);
 
+				//fetch the feature data for songs sent by user
 				clusterSongs = getClusterSongs(docs, clusters);
 
-				if(targetSongs.length == 0) {
+				if((targetSongs.length == 0) || (clusters.length == 0)) {
+					//implies user library encompasses the db
 					console.log("No possible recommendations");
 					res.send({"result": "No possible recommendations"});
 					return;
 				}
 
+				//will store recommendations
 				var recs = [];
 
+				//check each possible recommendation
 				for(var i in targetSongs) {
+					//will store the number of user's songs that are similar
 					var count = 0;
 
+					//compare with each user song
 					for(j in clusters) {
+						//if normalised euclidean distance is less than epsilon
 						if(normalisedEuclidean(targetSongs[i], clusterSongs[j], minmax) <= epsilon) {
 							count++;
 						}
 					}
 
+					//update top 10 recs
 					if(((count > 0) && (recs.length < 10)) || ((recs.length > 10) && (count > recs[10].count))) {
 						recs.push({"name": targetSongs[i].name, "count": count});
 						recs.sort(function(a, b) {return a.count - b.count});
 
+						//if more than 10 recs
 						if(recs.legth > 10){
 							recs.pop();
 						}
 					}
 				}
 
+				//no songs within epsilon
 				if(recs.length == 0){
 					console.log("No similar songs");
 					res.send({"result": "No similar songs"});
 					return;
 				}
-				else {
+				else { //return recommendations
 					console.log(recs.length);
 					res.send({"result": "success", data: recs});
 					return;
@@ -116,6 +132,7 @@ exports.recommend = function(req, res) {
 	});
 };
 
+//return maximum and minimum for every feature
 exports.getMinMax = function(req, res) {
 	console.log("/POST on " + req.originalUrl);
 
@@ -126,7 +143,9 @@ exports.getMinMax = function(req, res) {
 	});
 };
 
+//normalise feature value
 normalise = function(feature, minmax) {
+	//find relevant minmax in array
 	for (i in minmax) {
 		if (minmax[i].name == feature.name) {
 			break;
@@ -135,6 +154,7 @@ normalise = function(feature, minmax) {
 	return (feature.value - minmax[i].min) / (minmax[i].max - minmax[i].min);
 };
 
+//remove items from clusters that match label
 filterClusters = function(clusters, label) {
 	for (i = 0; i < clusters.length; i++) {
 		if (clusters[i].label == label) {
@@ -144,6 +164,7 @@ filterClusters = function(clusters, label) {
 	}
 };
 
+//get song objects (containing feature data) from all if they are in user library
 getClusterSongs = function(all, clusters) {
 	var clusterSongs = [];
 	for (i in clusters) {
